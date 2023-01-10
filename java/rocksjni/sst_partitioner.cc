@@ -41,3 +41,27 @@ void Java_org_rocksdb_SstPartitionerFixedPrefixFactory_disposeInternal(
       std::shared_ptr<ROCKSDB_NAMESPACE::SstPartitionerFactory>*>(jhandle);
   delete ptr;  // delete std::shared_ptr
 }
+
+/*
+ * Class:     org_rocksdb_SstPartitionerArchivalFactory
+ * Method:    newSstPartitionerArchivalFactory0
+ * Signature: ()J
+ */
+jlong Java_org_rocksdb_SstPartitionerArchivalFactory_newSstPartitionerArchivalFactory0(
+    JNIEnv*, jclass) {
+  auto* ptr = new std::shared_ptr<ROCKSDB_NAMESPACE::SstPartitionerFactory>(
+      ROCKSDB_NAMESPACE::NewSstPartitionerArchivalFactory());
+  return GET_CPLUSPLUS_POINTER(ptr);
+}
+
+/*
+ * Class:     org_rocksdb_SstPartitionerArchivalFactory
+ * Method:    disposeInternal
+ * Signature: (J)V
+ */
+void Java_org_rocksdb_SstPartitionerArchivalFactory_disposeInternal(
+    JNIEnv*, jobject, jlong jhandle) {
+  auto* ptr = reinterpret_cast<
+      std::shared_ptr<ROCKSDB_NAMESPACE::SstPartitionerFactory>*>(jhandle);
+  delete ptr;  // delete std::shared_ptr
+}

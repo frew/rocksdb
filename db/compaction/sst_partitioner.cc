@@ -58,6 +58,60 @@ std::shared_ptr<SstPartitionerFactory> NewSstPartitionerFixedPrefixFactory(
   return std::make_shared<SstPartitionerFixedPrefixFactory>(prefix_len);
 }
 
+PartitionerResult SstPartitionerArchival::ShouldPartition(
+    const PartitionerRequest& request) {
+  if (!is_manual_compaction_) {
+    return kNotRequired;
+  }
+
+  Slice last_key_fixed(*request.prev_user_key);
+  bool found_null = false;
+  for (size_t i = 0; i < last_key_fixed.size(); i++) {
+    if (last_key_fixed[i] == '\0') {
+      last_key_fixed.size_ = i;
+      found_null = true;
+      break;
+    }
+  }
+  if (!found_null) {
+    // TODO - Is there some good way of warning when this happens?
+    return kNotRequired;
+  }
+
+  found_null = false;
+  Slice current_key_fixed(*request.current_user_key);
+  for (size_t i = 0; i < current_key_fixed.size(); i++) {
+    if (current_key_fixed[i] == '\0') {
+      current_key_fixed.size_ = i;
+      found_null = true;
+      break;
+    }
+  }
+  if (!found_null) {
+    // TODO - Is there some good way of warning when this happens?
+    return kNotRequired;
+  }
+
+  return last_key_fixed.compare(current_key_fixed) != 0 ? kRequired
+                                                        : kNotRequired;
+}
+
+bool SstPartitionerArchival::CanDoTrivialMove(
+    const Slice& smallest_user_key, const Slice& largest_user_key) {
+  return ShouldPartition(PartitionerRequest(smallest_user_key, largest_user_key,
+                                            0)) == kNotRequired;
+}
+
+std::unique_ptr<SstPartitioner>
+SstPartitionerArchivalFactory::CreatePartitioner(
+    const SstPartitioner::Context& context) const {
+  return std::unique_ptr<SstPartitioner>(new SstPartitionerArchival(context.is_manual_compaction));
+}
+
+std::shared_ptr<SstPartitionerFactory> NewSstPartitionerArchivalFactory() {
+  return std::make_shared<SstPartitionerArchivalFactory>();
+}
+
 #ifndef ROCKSDB_LITE
 namespace {
 static int RegisterSstPartitionerFactories(ObjectLibrary& library,
@@ -68,6 +122,14 @@ static int RegisterSstPartitionerFactories(ObjectLibrary& library,
          std::unique_ptr<SstPartitionerFactory>* guard,
          std::string* /* errmsg */) {
         guard->reset(new SstPartitionerFixedPrefixFactory(0));
+        return guard->get();
+      });
+  library.AddFactory<SstPartitionerFactory>(
+      SstPartitionerArchivalFactory::kClassName(),
+      [](const std::string& /*uri*/,
+         std::unique_ptr<SstPartitionerFactory>* guard,
+         std::string* /* errmsg */) {
+        guard->reset(new SstPartitionerArchivalFactory());
         return guard->get();
       });
   return 1;

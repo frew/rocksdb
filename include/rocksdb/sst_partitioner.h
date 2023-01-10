@@ -139,4 +139,46 @@ class SstPartitionerFixedPrefixFactory : public SstPartitionerFactory {
 extern std::shared_ptr<SstPartitionerFactory>
 NewSstPartitionerFixedPrefixFactory(size_t prefix_len);
 
+
+/*
+ * Partitioner that splits on the first null byte only if it's a manual compaction
+ */
+class SstPartitionerArchival : public SstPartitioner {
+ public:
+  explicit SstPartitionerArchival(bool is_manual_compaction) : is_manual_compaction_(is_manual_compaction) {}
+
+  virtual ~SstPartitionerArchival() override {}
+
+  const char* Name() const override { return "SstPartitionerArchival"; }
+
+  PartitionerResult ShouldPartition(const PartitionerRequest& request) override;
+
+  bool CanDoTrivialMove(const Slice& smallest_user_key,
+                        const Slice& largest_user_key) override;
+
+ private:
+  bool is_manual_compaction_;
+};
+
+/*
+ * Factory for fixed prefix partitioner.
+ */
+class SstPartitionerArchivalFactory : public SstPartitionerFactory {
+ public:
+  explicit SstPartitionerArchivalFactory() { }
+
+  ~SstPartitionerArchivalFactory() override {}
+
+  static const char* kClassName() { return "SstPartitionerArchivalFactory"; }
+  const char* Name() const override { return kClassName(); }
+
+  std::unique_ptr<SstPartitioner> CreatePartitioner(
+      const SstPartitioner::Context& /* context */) const override;
+
+ private:
+};
+
+extern std::shared_ptr<SstPartitionerFactory>
+NewSstPartitionerArchivalFactory();
+
 }  // namespace ROCKSDB_NAMESPACE

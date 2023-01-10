@@ -223,6 +223,7 @@ set(JAVA_MAIN_CLASSES
   src/main/java/org/rocksdb/SstFileReader.java
   src/main/java/org/rocksdb/SstFileReaderIterator.java
   src/main/java/org/rocksdb/SstFileWriter.java
+  src/main/java/org/rocksdb/SstPartitionerArchivalFactory.java
   src/main/java/org/rocksdb/SstPartitionerFactory.java
   src/main/java/org/rocksdb/SstPartitionerFixedPrefixFactory.java
   src/main/java/org/rocksdb/StateType.java
@@ -487,6 +488,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11.4")
           org.rocksdb.SstFileWriter
           org.rocksdb.SstFileReader
           org.rocksdb.SstFileReaderIterator
+          org.rocksdb.SstPartitionerArchivalFactory
           org.rocksdb.SstPartitionerFactory
           org.rocksdb.SstPartitionerFixedPrefixFactory
           org.rocksdb.Statistics

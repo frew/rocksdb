@@ -67,6 +67,7 @@ NATIVE_JAVA_CLASSES = \
 	org.rocksdb.SstFileWriter\
 	org.rocksdb.SstFileReader\
 	org.rocksdb.SstFileReaderIterator\
+	org.rocksdb.SstPartitionerArchivalFactory\
 	org.rocksdb.SstPartitionerFactory\
 	org.rocksdb.SstPartitionerFixedPrefixFactory\
 	org.rocksdb.Statistics\
