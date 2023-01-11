@@ -13,7 +13,7 @@
 
 #include <memory>
 
-#include "include/org_rocksdb_SstPartitionerFixedPrefixFactory.h"
+#include "include/org_rocksdb_SstPartitionerArchivalFactory.h"
 #include "rocksdb/sst_file_manager.h"
 #include "rocksjni/cplusplus_to_java_convert.h"
 #include "rocksjni/portal.h"
